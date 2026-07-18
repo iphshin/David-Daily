@@ -594,7 +594,19 @@ function App() {
                   <div className="thumb-row">
                     {r.images.map((url, i) => (
                       <div className="thumb-wrap" key={i}>
-                        <img src={url} onClick={() => setLightboxUrl(url)} />
+                        <img
+                          src={url}
+                          loading="lazy"
+                          onClick={() => setLightboxUrl(url)}
+                          onError={(e) => {
+                            const img = e.target;
+                            const tries = Number(img.dataset.retries || 0);
+                            if (tries < 3) {
+                              img.dataset.retries = tries + 1;
+                              setTimeout(() => { img.src = url + '&r=' + Date.now(); }, 700 * (tries + 1));
+                            }
+                          }}
+                        />
                         <button className="thumb-remove" onClick={() => handleRemoveImage(r.row, url)}>×</button>
                       </div>
                     ))}
